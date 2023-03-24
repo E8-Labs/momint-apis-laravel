@@ -13,7 +13,7 @@ class UserProfileFullResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
         $user = User::where('id', $this->user_id)->first();
         // $url = $this->image_url;
@@ -33,12 +33,6 @@ class UserProfileFullResource extends JsonResource
             'lang' => $this->lang,
              "user_id" => $this->user_id,
              'nationality' => $this->nationality,
-            
-            
-
-            // "unread_notifications" => $count,
-            // "unread_messages" => $unread_messages,
-
         ];
     }
 }
