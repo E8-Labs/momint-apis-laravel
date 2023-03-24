@@ -350,7 +350,7 @@ class UserAuthController extends Controller
 			$codeDB = VerificationCode::where('email', $email)->where('code', $digitcode)->first();
 			if($codeDB || $request->code == "1234"){
 				VerificationCode::where('email', $request->email)->delete();
-				return true
+				return true;
 			}
 			else{
 				return false;
