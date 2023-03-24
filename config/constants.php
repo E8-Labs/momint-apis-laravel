@@ -25,8 +25,8 @@
 
 
     
-    'profile_images' => "http://www.theprevueapp.com/momint/storage/app/",
-    'profile_images_clone' => "http://www.theprevueapp.com/momint_clone/storage/app/",
+    'profile_images' => "http://www.zorroapp.tech/momint/storage/app/",
+    'profile_images_clone' => "http://www.zorroapp.tech/momint_clone/storage/app/",
     'Date_Format' => 'm-d-Y'
 
 
