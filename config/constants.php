@@ -26,6 +26,7 @@
 
     
     'profile_images' => "http://www.zorroapp.tech/momint/storage/app/",
+    
     'profile_images_clone' => "http://www.zorroapp.tech/momint_clone/storage/app/",
     'Date_Format' => 'm-d-Y'
 

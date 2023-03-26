@@ -27,7 +27,7 @@ class MintableListingImageResource extends JsonResource
             "ipfs_hash" => $this->ipfs_hash,
             "image_location" => $this->image_location,
             "image_width" => $this->image_width,
-            "image_url" => \Config::get('constants.listing_images').$this->image_url,
+            "image_url" => \Config::get('constants.profile_images').$this->image_url,
             "image_height" => $this->image_height,
             
             'lat' => $this->lat,

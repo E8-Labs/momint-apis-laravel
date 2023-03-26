@@ -192,14 +192,14 @@ class MintListingController extends Controller
 		
     		$imageData = base64_decode($ima);
     		//Set image whole path here 
-    		$filePath = $_SERVER['DOCUMENT_ROOT']."/". $folder ."/storage/app/Images/" . $fileName;
+    		$filePath = $_SERVER['DOCUMENT_ROOT']."/". $folder ."/storage/app/Listing/" . $fileName;
 
-            if(!Storage::exists($_SERVER['DOCUMENT_ROOT']."/" . $folder ."/storage/app/Images/" )){
+            if(!Storage::exists($_SERVER['DOCUMENT_ROOT']."/" . $folder ."/storage/app/Listing/" )){
             	// echo "doesn't exist";
-                Storage::makeDirectory($_SERVER['DOCUMENT_ROOT']."/". $folder ."/storage/app/Images/"  );
+                Storage::makeDirectory($_SERVER['DOCUMENT_ROOT']."/". $folder ."/storage/app/Listing/"  );
             }
    			file_put_contents($filePath, $imageData);
-   			$url = "Images/" . $fileName;
+   			$url = "Listing/" . $fileName;
    			return $url;
     }
 
