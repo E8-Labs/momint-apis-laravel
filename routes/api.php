@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\Minting\MintListingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,11 @@ Route::group([
 ], function ($router) {
 	Route::get("me",[UserAuthController::class,'getMyProfile']);
 	Route::get("profile",[UserAuthController::class,'getOtherUserProfile']);
+
+	//Minting
+	Route::post("add_listing",[MintListingController::class,'addListing']);
+	Route::post("update_listing",[MintListingController::class,'updateListing']);
+	Route::get("get_listings",[MintListingController::class,'getListings']);
 
     // Route::post('login', 'Auth\UserAuthController@login');
     Route::post('logout', 'Auth\UserAuthController@logout');

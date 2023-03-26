@@ -13,7 +13,7 @@ class UserProfileLiteResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
         $user = User::where('id', $this->user_id)->first();
         // $url = $this->image_url;
@@ -27,13 +27,7 @@ class UserProfileLiteResource extends JsonResource
             "name" => $this->username,
             "username" => $this->username,
             "profile_image" => \Config::get('constants.profile_images').$this->image_url,
-            "authProvider" => $p,
-            'city' => $this->city,
-            "state" => $this->state,
-            'lat' => $this->lat,
-            'lang' => $this->lang,
              "user_id" => $user->id,
-             'nationality' => $this->nationality,
             
             
 
