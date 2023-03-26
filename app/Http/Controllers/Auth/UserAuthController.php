@@ -178,7 +178,7 @@ class UserAuthController extends Controller
     	// return "Creating user";
 				if($request->hasFile('profile_image'))
 				{
-					$data=$request->file('profile_image')->store('Images/' . $user->id);
+					$data=$request->file('profile_image')->store('Images/');
 					$profile->image_url = $data;
 					
 				}

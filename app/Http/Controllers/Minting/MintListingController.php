@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
 use App\Models\User;
 use App\Models\Auth\Profile;
 use App\Models\Auth\VerificationCode;
@@ -48,16 +50,18 @@ class MintListingController extends Controller
 			$listing->listing_name = $request->listing_name;
 			$listing->is_explicit_content = $request->is_explicit_content;
 			$listing->listing_description = $request->listing_description;
-			$saved = $listing->saved();
+			$listing->user_id = Auth::user()->id;
+			$saved = $listing->save();
 
 			if(!$saved){
+				DB::rollBack();
 				return response()->json(['status' => false,
 					'message'=> 'Error saving Listing',
 					'data' => null, ]);
 			}
 
 			//save tags 
-			$tags = $listing->tags;
+			$tags = $request->tags;
 
 			foreach($tags as $tag){
 				$mintTag = new MintableListingTags;
@@ -72,9 +76,82 @@ class MintListingController extends Controller
 			$images = $request->images; //array of base64 images alongwith data
 
 			foreach($images as $image){
-				$b64 = $image->base64;
+				$b64 = $image["base64"];
+				$url = $this->storeBase64Image($b64, Auth::user());
+
+				$mintImage = new MintableListingImages;
+				$mintImage->listing_id = $listing->id;
+				$mintImage->image_url = $url;
+				$mintImage->ipfs_hash = $image["ipfs_hash"];
+				$mintImage->image_location = $image["image_location"];
+				$mintImage->image_width = $image["image_width"];
+				$mintImage->image_height = $image["image_height"];
+				$mintImage->lat = $image["lat"];
+				$mintImage->lang = $image["lang"];
+				$mintImage->image_count = $image["image_count"];
+				$mintImage->save();
 
 			}
+
+			DB::commit();
+
+			return response()->json(['status' => true,
+					'message'=> 'Listing saved',
+					'data' => new MintListingResource($listing), 
+				]);
+    }
+
+    function updateListing(Request $request){
+    	$user = Auth::user();
+
+    	$listing_id = $request->listing_id;
+    	$listing = MintableListing::where('id', $listing_id)->first();
+
+
+    	$updateArray = array();
+    	if($request->has('listing_price')){
+    		$listing->listing_price = $request->listing_price;
+    	}
+    	if($request->has('currency')){
+    		$listing->currency = $request->currency;
+    	}
+    	if($request->has('royalty_percentage')){
+    		$listing->royalty_percentage = $request->royalty_percentage;
+    	}
+    	$saved = $listing->save();
+    	if($saved){
+				return response()->json(['status' => true,
+					'message'=> 'Listing saved',
+					'data' => new MintListingResource($listing), 
+				]);
+    	}
+    	else{
+    		return response()->json(['status' => false,
+					'message'=> 'Listing not saved',
+					'data' => new MintListingResource($listing), 
+				]);
+    	}
+
+    }
+
+    function getListings(Request $request){
+    	$user = Auth::user();
+    	$userid = $user->id;
+    	if($request->has('user_id')){
+    		$userid = $request->user_id;
+    	}
+    	$off_set = 0;
+    	if($request->has('off_set')){
+    		$off_set = $request->off_set;
+    	}
+
+    	$list = MintableListing::where('user_id', $userid)->skip($off_set)->take(20)->get();
+
+    	return response()->json(['status' => true,
+					'message'=> 'Listings',
+					'data' => MintListingResource::collection($list), 
+				]);
+
     }
 
     function storeBase64Image($ima, User $user){
@@ -89,17 +166,16 @@ class MintListingController extends Controller
 		
     		$imageData = base64_decode($ima);
     		//Set image whole path here 
-    		$filePath = $_SERVER['DOCUMENT_ROOT']."/". $folder ."/storage/app/Images/" . $user->id . '/' . $fileName;
+    		$filePath = $_SERVER['DOCUMENT_ROOT']."/". $folder ."/storage/app/Images/" . $fileName;
 
-            if(!Storage::exists($_SERVER['DOCUMENT_ROOT']."/" . $folder ."/storage/app/Images/" . $user->id )){
-                Storage::makeDirectory($_SERVER['DOCUMENT_ROOT']."/". $folder ."/storage/app/Images/" . $user->id );
+            if(!Storage::exists($_SERVER['DOCUMENT_ROOT']."/" . $folder ."/storage/app/Images/" )){
+            	// echo "doesn't exist";
+                Storage::makeDirectory($_SERVER['DOCUMENT_ROOT']."/". $folder ."/storage/app/Images/"  );
             }
    			file_put_contents($filePath, $imageData);
-   			$url = "Images/" . $user->id . '/' . $fileName;
+   			$url = "Images/" . $fileName;
    			return $url;
     }
 
-    function updateListing(Request $request){
-
-    }
+    
 }
