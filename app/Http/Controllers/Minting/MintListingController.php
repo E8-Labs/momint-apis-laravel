@@ -144,8 +144,15 @@ class MintListingController extends Controller
     	if($request->has('off_set')){
     		$off_set = $request->off_set;
     	}
-
+    	$status = MintableListingStatus::StatusBoth;
     	$list = MintableListing::where('user_id', $userid)->skip($off_set)->take(20)->get();
+    	if($request->has('status')){
+    		$status = $request->status;
+    		$list = MintableListing::where('user_id', $userid)->where('minting_status', $status)->skip($off_set)->take(20)->get();
+    	}
+
+    	
+
 
     	return response()->json(['status' => true,
 					'message'=> 'Listings',
