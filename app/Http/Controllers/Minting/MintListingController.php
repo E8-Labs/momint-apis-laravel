@@ -44,6 +44,13 @@ class MintListingController extends Controller
 					'data' => null, 
 					'validation_errors'=> $validator->errors()]);
 			}
+			$user = Auth::user();
+			if(!$user){
+    		return response()->json(['status' => false,
+					'message'=> 'Unauthorized access',
+					'data' => null, 
+				]);
+    		}
 
 			DB::beginTransaction();
 			$listing = new MintableListing;
@@ -103,6 +110,12 @@ class MintListingController extends Controller
 
     function updateListing(Request $request){
     	$user = Auth::user();
+    	if(!$user){
+    		return response()->json(['status' => false,
+					'message'=> 'Unauthorized access',
+					'data' => null, 
+				]);
+    	}
 
     	$listing_id = $request->listing_id;
     	$listing = MintableListing::where('id', $listing_id)->first();
@@ -136,6 +149,12 @@ class MintListingController extends Controller
 
     function getListings(Request $request){
     	$user = Auth::user();
+    	if(!$user){
+    		return response()->json(['status' => false,
+					'message'=> 'Unauthorized access',
+					'data' => null, 
+				]);
+    	}
     	$userid = $user->id;
     	if($request->has('user_id')){
     		$userid = $request->user_id;
