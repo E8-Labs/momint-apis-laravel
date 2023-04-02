@@ -40,8 +40,11 @@ Route::group([
 	Route::get("me",[UserAuthController::class,'getMyProfile']);
 	Route::get("profile",[UserAuthController::class,'getOtherUserProfile']);
 
+    Route::post("delete_user",[UserAuthController::class,'deleteUser']);
+
 	//Minting
 	Route::post("add_listing",[MintListingController::class,'addListing']);
+    Route::post("delete_listing",[MintListingController::class,'deleteListing']);
 	Route::post("update_listing",[MintListingController::class,'updateListing']);
 	Route::get("get_listings",[MintListingController::class,'getListings']);
 

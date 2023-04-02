@@ -30,7 +30,7 @@ class MintListingResource extends JsonResource
             "id" => $this->id,
             "listing_name" => $this->listing_name,
             "listing_descripion" => $this->listing_description,
-            "is_explicit_content" => $this->is_explicit_content,
+            "is_explicit_content" => (bool)$this->is_explicit_content,
             "listing_price" => $this->listing_price,
             "currency"=> $this->currency,
             "royalty_percentage"=> $this->royalty_percentage,

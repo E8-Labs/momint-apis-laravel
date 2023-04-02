@@ -41,6 +41,31 @@ class UserAuthController extends Controller
     	}
     }
 
+    function deleteUser(Request $request){
+        $user = Auth::user();
+        if($user){
+            $deleted = User::where('id', $user->id)->delete();
+            if($deleted){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'User deleted',
+                ], 200);
+            }
+            else{
+                return response()->json([
+                'status' => false,
+                'message' => 'Some error occurred',
+            ], 200);
+            }
+        }
+        else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthenticated access',
+            ], 401);
+        }
+    }
+
     public function getOtherUserProfile(Request $request){
     	$user = Auth::user();
     	if($user){
