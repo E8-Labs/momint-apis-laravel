@@ -55,5 +55,6 @@ Route::group([
     Route::post('me', 'Auth\UserAuthController@me');
 
     Route::get('admin_dashboard', [AdminController::class, 'getGraphData']);
+    Route::get('users', [AdminController::class, 'getUsers']);
 
 });

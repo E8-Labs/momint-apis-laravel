@@ -23,6 +23,7 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+	const Page_Limit = 20;
 
     // admin function to load user profiles
     public function getUsers(Request $request){
@@ -46,7 +47,7 @@ class AdminController extends Controller
                     $query->where(function($query) use($tokens){
                         foreach($tokens as $tok){
 
-                            $query->where('full_name', 'LIKE', "%$tok%");
+                            $query->where('username', 'LIKE', "%$tok%");
                         }
                     });
                     if($request->has('location')){
@@ -64,7 +65,7 @@ class AdminController extends Controller
                         }
                     }
                     
-                    $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take($this->Page_Limit)->get();
+                    $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
                     
                 }
             }
@@ -87,7 +88,7 @@ class AdminController extends Controller
                             $query->where('city', 'LIKE', "%$tok%")->where('state', 'LIKE', "%$tok2%");
                         }
                     }
-                $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take($this->Page_Limit)->get();
+                $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
             }
             return response()->json([
                 'status' => true,
