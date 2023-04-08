@@ -13,6 +13,7 @@ use App\Http\Resources\Profile\UserProfileFullResource;
 use App\Http\Resources\Profile\UserProfileLiteResource;
 
 use App\Models\Auth\Profile;
+use App\Models\Auth\UserRole;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -78,5 +79,12 @@ class User extends Authenticatable implements JWTSubject
         // else{
         //    return new ProfileResource( $this->createDefaultProfile());
         // }
+    }
+
+    public function isAdmin(){
+        if($this->role == UserRole::Admin){
+            return true;
+        }
+        return false;
     }
 }

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Minting\MintListingController;
+use App\Http\Controllers\Admin\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,5 +53,8 @@ Route::group([
     Route::post('logout', 'Auth\UserAuthController@logout');
     Route::post('refresh', 'Auth\UserAuthController@refresh');
     Route::post('me', 'Auth\UserAuthController@me');
+
+    Route::get('admin_dashboard', [AdminController::class, 'getGraphData']);
+    Route::get('users', [AdminController::class, 'getUsers']);
 
 });
