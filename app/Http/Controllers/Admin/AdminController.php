@@ -166,7 +166,7 @@ class AdminController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Users found',
-                'data' => ["graph_dat1" => $graph1, "graph_data3" => $graph3, "graph_data6" => $graph6, "graph_data12" => $graph12, "graph_data_all" => $graphAll,
+                'data' => ["graph_data1" => $graph1, "graph_data3" => $graph3, "graph_data6" => $graph6, "graph_data12" => $graph12, "graph_data_all" => $graphAll,
                 'current_year_start' => $startOfYear, 'current_year_end' => $endOfYear, 'total_users' => $total_users, "new_users" => $usersInLast7Days, "new_user_percentage" => ($usersInLast7Days / $total_users ) * 100, "mints" => $listings_count, 
                 "mints_graph_data1" => $mintGraphData1,
                 "mints_graph_data3" => $mintGraphData3,
