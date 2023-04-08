@@ -174,13 +174,13 @@ class AdminController extends Controller
         }
 
 
-
+        $mintGraphData = $this->getMintsGraphData($months);
             // return $users;
         $listings_count = MintableListing::count('id');
             return response()->json([
                 'status' => true,
                 'message' => 'Users found',
-                'data' => ["graph_data" => $graph, 'current_year_start' => $startOfYear, 'current_year_end' => $endOfYear, 'total_users' => $total_users, "new_users" => $usersInLast7Days, "new_user_percentage" => ($usersInLast7Days / $total_users ) * 100, "mints" => $listings_count],
+                'data' => ["graph_data" => $graph, 'current_year_start' => $startOfYear, 'current_year_end' => $endOfYear, 'total_users' => $total_users, "new_users" => $usersInLast7Days, "new_user_percentage" => ($usersInLast7Days / $total_users ) * 100, "mints" => $listings_count, "mints_graph_data" => $mintGraphData],
                 
             ], 200);
         }
@@ -190,6 +190,33 @@ class AdminController extends Controller
                 'message' => 'Only admin can perform this action',
             ], 401);
         }
+    }
+
+    function getMintsGraphData($forMonths){
+         $graph = Array();
+         $date = Carbon::now()->subMonths($forMonths);
+        $newD = $date->copy();
+        // return $newD;
+        // while($newD <= $endOfYear){ //old logic
+        while($newD <= Carbon::now()){
+
+            $users = MintableListing::select(DB::raw('count(id) as mints'))
+                ->where(function($q) use( $newD){
+                    $startDay = $newD->copy()->startOfDay();
+                    $endDay   = $newD->copy()->endOfDay();
+                    $q->where('created_at', '>=', $startDay)
+                    ->where('created_at', '<=', $endDay);
+                })
+                ->first();
+                if($users){
+                    $data = ["users" => $users['mints'], 'registeredDate' => $newD->copy()];
+                    // return $data;
+                    $graph[] = $data;
+                }
+                $newD->addDay();
+                // return $newD;
+        }
+        return $graph;
     }
 
 
