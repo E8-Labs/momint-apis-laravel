@@ -149,6 +149,44 @@ class AdminController extends Controller
             // ->groupBy('registeredDate')
             // ->get();
 
+        $graph1 = $this->getUsersGraphData(1);
+        $graph3 = $this->getUsersGraphData(3);
+        $graph6 = $this->getUsersGraphData(6);
+        $graph12 = $this->getUsersGraphData(12);
+        $graphAll = $this->getUsersGraphData(24); // 2 years
+
+
+        $mintGraphData1 = $this->getMintsGraphData(1);
+        $mintGraphData3 = $this->getMintsGraphData(3);
+        $mintGraphData6 = $this->getMintsGraphData(6);
+        $mintGraphData12 = $this->getMintsGraphData(12);
+        $mintGraphDataAll = $this->getMintsGraphData(24); // 2 years
+            // return $users;
+        $listings_count = MintableListing::count('id');
+            return response()->json([
+                'status' => true,
+                'message' => 'Users found',
+                'data' => ["graph_data1" => $graph1, "graph_data3" => $graph3, "graph_data6" => $graph6, "graph_data12" => $graph12, "graph_data_all" => $graphAll,
+                'current_year_start' => $startOfYear, 'current_year_end' => $endOfYear, 'total_users' => $total_users, "new_users" => $usersInLast7Days, "new_user_percentage" => ($usersInLast7Days / $total_users ) * 100, "mints" => $listings_count, 
+                "mints_graph_data1" => $mintGraphData1,
+                "mints_graph_data3" => $mintGraphData3,
+                "mints_graph_data6" => $mintGraphData6,
+                "mints_graph_data12" => $mintGraphData12,
+                "mints_graph_data_all" => $mintGraphDataAll],
+                
+            ], 200);
+        }
+        else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Only admin can perform this action',
+            ], 401);
+        }
+    }
+
+    function getUsersGraphData($fromMonths){
+
+        $date = Carbon::now()->subMonths($fromMonths);//->subDays(7);//->subYears(5)  
         $graph = Array();
         // $newD = $startOfYear->copy(); // this was t0 get all the users from start of current month to the end
         $newD = $date->copy();
@@ -157,10 +195,10 @@ class AdminController extends Controller
         while($newD <= Carbon::now()){
 
             $users = Profile::select(DB::raw('count(id) as users'))
-                ->where(function($q) use($user, $newD){
+                ->where(function($q) use($newD){
                     $startDay = $newD->copy()->startOfDay();
                     $endDay   = $newD->copy()->endOfDay();
-                    $q->where('user_id', '!=', $user->id)->where('created_at', '>=', $startDay)
+                    $q->where('created_at', '>=', $startDay)
                     ->where('created_at', '<=', $endDay);
                 })
                 ->first();
@@ -172,24 +210,34 @@ class AdminController extends Controller
                 $newD->addDay();
                 // return $newD;
         }
+        return $graph;
+    }
 
+    function getMintsGraphData($forMonths){
+         $graph = Array();
+         $date = Carbon::now()->subMonths($forMonths);
+        $newD = $date->copy();
+        // return $newD;
+        // while($newD <= $endOfYear){ //old logic
+        while($newD <= Carbon::now()){
 
-
-            // return $users;
-        $listings_count = MintableListing::count('id');
-            return response()->json([
-                'status' => true,
-                'message' => 'Users found',
-                'data' => ["graph_data" => $graph, 'current_year_start' => $startOfYear, 'current_year_end' => $endOfYear, 'total_users' => $total_users, "new_users" => $usersInLast7Days, "new_user_percentage" => ($usersInLast7Days / $total_users ) * 100, "mints" => $listings_count],
-                
-            ], 200);
+            $users = MintableListing::select(DB::raw('count(id) as mints'))
+                ->where(function($q) use( $newD){
+                    $startDay = $newD->copy()->startOfDay();
+                    $endDay   = $newD->copy()->endOfDay();
+                    $q->where('created_at', '>=', $startDay)
+                    ->where('created_at', '<=', $endDay);
+                })
+                ->first();
+                if($users){
+                    $data = ["users" => $users['mints'], 'registeredDate' => $newD->copy()];
+                    // return $data;
+                    $graph[] = $data;
+                }
+                $newD->addDay();
+                // return $newD;
         }
-        else{
-            return response()->json([
-                'status' => false,
-                'message' => 'Only admin can perform this action',
-            ], 401);
-        }
+        return $graph;
     }
 
 
