@@ -13,6 +13,7 @@ use App\Models\Minting\MintableListing;
 // use App\Models\User\MapVisibility;
 use App\Models\Auth\Profile;
 use App\Models\Auth\UserRole;
+use App\Models\Auth\AccountStatus;
 // use App\Models\User\VerificationCode;
 use Illuminate\Support\Facades\Mail;
 
@@ -256,7 +257,7 @@ class AdminController extends Controller
 
         $user = Auth::user();
         if ($user){
-            $userDeleted = User::where('id', $request->user_id)->delete();
+            $userDeleted = User::where('id', $request->user_id)->update['account_status' => AccountStatus::StatusDeleted];
             if($userDeleted){
                 return response()->json([
                     'status' => true,
@@ -267,6 +268,42 @@ class AdminController extends Controller
                 return response()->json([
                  'status' => false,
                  'message' => 'Error deleting user',
+                ]);
+            }
+        }
+        else{
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized access',
+            ]);
+        }
+    }
+    function disableUser(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required',
+                ]);
+
+            if($validator->fails()){
+                return response()->json(['status' => false,
+                    'message'=> 'validation error',
+                    'data' => null, 
+                    'validation_errors'=> $validator->errors()]);
+            }
+
+
+        $user = Auth::user();
+        if ($user){
+            $userDeleted = User::where('id', $request->user_id)->update['account_status' => AccountStatus::StatusDisabled];
+            if($userDeleted){
+                return response()->json([
+                    'status' => true,
+                    'message' => 'User Disabled',
+                ]);
+            }
+            else{
+                return response()->json([
+                 'status' => false,
+                 'message' => 'Error disabling user',
                 ]);
             }
         }

@@ -42,6 +42,7 @@ Route::group([
 	Route::get("profile",[UserAuthController::class,'getOtherUserProfile']);
 
     Route::post("delete_user",[UserAuthController::class,'deleteUser']);
+    Route::post("disable_user",[UserAuthController::class,'disableUser']);
 
 	//Minting
 	Route::post("add_listing",[MintListingController::class,'addListing']);
