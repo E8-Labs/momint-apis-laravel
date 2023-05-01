@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Minting\MintListingController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Auth\ProfileUpdateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +45,8 @@ Route::group([
 
     Route::post("delete_user",[UserAuthController::class,'deleteUser']);
     Route::post("disable_user",[UserAuthController::class,'disableUser']);
+
+    Route::post('update_profile', [ProfileUpdateController::class, 'updateProfile']); // New
 
 	//Minting
 	Route::post("add_listing",[MintListingController::class,'addListing']);
