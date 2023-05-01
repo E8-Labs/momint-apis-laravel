@@ -5,6 +5,8 @@ namespace App\Http\Resources\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\User;
+use App\Models\Notification;
+use App\Models\NotificationType;
 
 class UserProfileFullResource extends JsonResource
 {
@@ -21,6 +23,9 @@ class UserProfileFullResource extends JsonResource
         if($p === NULL){
             $p = "email";
         }
+
+        $count = Notification::where('to_user', $user->id)->where('is_read', 0)->count('id');
+        
         return [
             "id" => $this->user_id,
             "email" => $user->email,
@@ -32,8 +37,10 @@ class UserProfileFullResource extends JsonResource
             "state" => $this->state,
             'lat' => $this->lat,
             'lang' => $this->lang,
+            "role" => $this->role,
              "user_id" => $this->user_id,
              'nationality' => $this->nationality,
+             "unread_notifications" => $count,
         ];
     }
 }
