@@ -31,7 +31,7 @@ class UserProfileLiteResource extends JsonResource
             "username" => $this->username,
             "profile_image" => \Config::get('constants.profile_images').$this->image_url,
              "user_id" => $user->id,
-            "role" => $this->role,
+            "role" => $user->role,
             
 
             "unread_notifications" => $count,

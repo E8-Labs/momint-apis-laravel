@@ -37,7 +37,7 @@ class UserProfileFullResource extends JsonResource
             "state" => $this->state,
             'lat' => $this->lat,
             'lang' => $this->lang,
-            "role" => $this->role,
+            "role" => $user->role,
              "user_id" => $this->user_id,
              'nationality' => $this->nationality,
              "unread_notifications" => $count,
