@@ -60,9 +60,9 @@ class NotificationResource extends JsonResource
         // }
         
         
-        // if($this->notification_type == NotificationType::PostLike || $this->notification_type == NotificationType::PostUnLike){
-        //     $post = ListingItem::where('id', $this->notifiable_id)->first();
-        // }
+        if($this->notification_type == NotificationType::PostLike || $this->notification_type == NotificationType::PostUnLike){
+            $post = ListingItem::where('id', $this->notifiable_id)->first();
+        }
         // if($this->notification_type == NotificationType::NewFollower){ 
         //     $follower = Profile::where('user_id', $this->notifiable_id)->first();
             
@@ -81,7 +81,7 @@ class NotificationResource extends JsonResource
             // "chat_message" => new ChatMessageResource($chat_message),
             // "comment" => new PostCommentResource($comment),
             // "flagged_user" => new UserProfileLiteResource($flagged_user),
-            // "post" => new  ListingItemResource($post),
+            "post" => new  MintListingResource($post),
             // "follower" => new UserProfileLiteResource($follower),
         ];
     }
