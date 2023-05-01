@@ -52,6 +52,7 @@ class NotificationController extends Controller
                 [
                     "status"  => true,
                     "message"      => "Notification Updated " . $count
+                    "unread" => $count,
                 ], 200
             );
         }
