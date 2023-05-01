@@ -60,8 +60,8 @@ class NotificationResource extends JsonResource
         // }
         
         
-        if($this->notification_type == NotificationType::PostLike || $this->notification_type == NotificationType::PostUnLike){
-            $post = ListingItem::where('id', $this->notifiable_id)->first();
+        if($this->notification_type == NotificationType::NewNFT){
+            $post = MintableListing::where('id', $this->notifiable_id)->first();
         }
         // if($this->notification_type == NotificationType::NewFollower){ 
         //     $follower = Profile::where('user_id', $this->notifiable_id)->first();
