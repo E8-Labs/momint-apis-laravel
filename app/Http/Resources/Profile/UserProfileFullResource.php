@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\User;
 use App\Models\Notification;
 use App\Models\NotificationType;
+use App\Models\Minting\MintableListing;
 
 class UserProfileFullResource extends JsonResource
 {
@@ -25,7 +26,7 @@ class UserProfileFullResource extends JsonResource
         }
 
         $count = Notification::where('to_user', $user->id)->where('is_read', 0)->count('id');
-        
+        $listings = MintableListing::where('user_id', $user->id)->count('id');
         return [
             "id" => $this->user_id,
             "email" => $user->email,
@@ -41,6 +42,7 @@ class UserProfileFullResource extends JsonResource
              "user_id" => $this->user_id,
              'nationality' => $this->nationality,
              "unread_notifications" => $count,
+             "listings_count" => $listings,
         ];
     }
 }
