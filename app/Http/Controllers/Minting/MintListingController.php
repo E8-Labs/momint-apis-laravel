@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 use App\Models\User;
 use App\Models\Auth\Profile;
+use App\Models\Auth\UserRole;
 use App\Models\Auth\VerificationCode;
 use Illuminate\Support\Facades\Mail;
 
@@ -27,6 +28,9 @@ use App\Models\Minting\MintableListing;
 use App\Models\Minting\MintableListingImages;
 use App\Models\Minting\MintableListingTags;
 use App\Models\Minting\MintableListingStatus;
+
+use App\Models\Notification;
+use App\Models\NotificationType;
 
 class MintListingController extends Controller
 {
@@ -86,7 +90,7 @@ class MintListingController extends Controller
 
             foreach($images as $image){
                 $b64 = $image["base64"];
-                $url = $this->storeBase64Image($b64, Auth::user());
+                $url = '';//$this->storeBase64Image($b64, Auth::user());
 
                 $mintImage = new MintableListingImages;
                 $mintImage->listing_id = $listing->id;
@@ -107,7 +111,8 @@ class MintListingController extends Controller
             }
 \Log::info("5");
             DB::commit();
-
+            $admin = User::where('role', UserRole::Admin)->first();
+            Notification::add(NotificationType::NewNFT, $user->id, $admin->id, $listing);
             return response()->json(['status' => true,
                     'message'=> 'Listing saved',
                     'data' => new MintListingResource($listing), 

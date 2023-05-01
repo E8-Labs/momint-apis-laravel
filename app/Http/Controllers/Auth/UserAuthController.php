@@ -10,12 +10,16 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Auth\Profile;
+use App\Models\Auth\UserRole;
 use App\Models\Auth\VerificationCode;
 use Illuminate\Support\Facades\Mail;
 
 use App\Http\Resources\Profile\UserProfileFullResource;
 use App\Http\Resources\Profile\UserProfileLiteResource;
 use Illuminate\Support\Facades\Http;
+
+use App\Models\Notification;
+use App\Models\NotificationType;
 
 class UserAuthController extends Controller
 {
@@ -219,6 +223,8 @@ class UserAuthController extends Controller
 				{
 					DB::commit();
         			$token = Auth::login($user);
+                    $admin = User::where('role', UserRole::Admin)->first();
+                    Notification::add(NotificationType::NewUser, $user->id, $admin->id, $user);
         			return response()->json([
         			    'status' => true,
         			    'message' => 'User created successfully',

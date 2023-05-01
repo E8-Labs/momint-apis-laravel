@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Minting\MintListingController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,5 +58,8 @@ Route::group([
 
     Route::get('admin_dashboard', [AdminController::class, 'getGraphData']);
     Route::get('users', [AdminController::class, 'getUsers']);
+
+
+    Route::get('notifications', [NotificationController::class, 'getNotifications']);//New
 
 });
