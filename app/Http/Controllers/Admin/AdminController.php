@@ -257,7 +257,7 @@ class AdminController extends Controller
 
         $user = Auth::user();
         if ($user){
-            $userDeleted = User::where('id', $request->user_id)->update['account_status' => AccountStatus::StatusDeleted];
+            $userDeleted = User::where('id', $request->user_id)->update(['account_status' => AccountStatus::StatusDeleted]);
             if($userDeleted){
                 return response()->json([
                     'status' => true,
@@ -293,7 +293,7 @@ class AdminController extends Controller
 
         $user = Auth::user();
         if ($user){
-            $userDeleted = User::where('id', $request->user_id)->update['account_status' => AccountStatus::StatusDisabled];
+            $userDeleted = User::where('id', $request->user_id)->update(['account_status' => AccountStatus::StatusDisabled]);
             if($userDeleted){
                 return response()->json([
                     'status' => true,
