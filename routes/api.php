@@ -51,8 +51,10 @@ Route::group([
 	//Minting
 	Route::post("add_listing",[MintListingController::class,'addListing']);
     Route::post("delete_listing",[MintListingController::class,'deleteListing']);
+    Route::post("flag_listing",[MintListingController::class,'flagListing']);
 	Route::post("update_listing",[MintListingController::class,'updateListing']);
 	Route::get("get_listings",[MintListingController::class,'getListings']);
+    Route::get("get_flagged_listings",[MintListingController::class,'getFlaggedListings']);
 
     // Route::post('login', 'Auth\UserAuthController@login');
     Route::post('logout', 'Auth\UserAuthController@logout');

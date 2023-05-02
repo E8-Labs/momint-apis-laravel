@@ -21,6 +21,7 @@ use App\Http\Resources\Profile\UserProfileFullResource;
 use App\Http\Resources\Profile\UserProfileLiteResource;
 
 use App\Http\Resources\Minting\MintListingResource;
+use App\Http\Resources\Minting\FlaggedListingResource;
 
 use Illuminate\Support\Facades\Http;
 
@@ -28,6 +29,8 @@ use App\Models\Minting\MintableListing;
 use App\Models\Minting\MintableListingImages;
 use App\Models\Minting\MintableListingTags;
 use App\Models\Minting\MintableListingStatus;
+
+use App\Models\Minting\FlaggedListing;
 
 use App\Models\Notification;
 use App\Models\NotificationType;
@@ -180,10 +183,58 @@ class MintListingController extends Controller
 
             MintableListing::where('id', $request->listing_id)->delete();
 
-            return response()->json(['status' => false,
+            return response()->json(['status' => true,
                     'message'=> 'Listing deleted',
                     'data' => null, 
                 ]);
+
+        }
+        else{
+            return response()->json(['status' => false,
+                    'message'=> 'Listing id not present',
+                    'data' => null, 
+                ]);
+        }
+    }
+
+    function flagListing(Request $request){
+        $user = Auth::user();
+        if(!$user){
+            return response()->json(['status' => false,
+                    'message'=> 'Unauthorized access',
+                    'data' => null, 
+                ]);
+        }
+        if($request->has('listing_id')){
+            $listing = FlaggedListing::where('listing_id', $request->listing_id)->where('from_user', $user->id)->first();
+            if($listing){
+                return response()->json(['status' => false,
+                    'message'=> 'Already flagged',
+                    'data' => null, 
+                ]);
+            }
+
+            $flag = new FlaggedListing;
+            $flag->from_user = $user->id;
+            $flag->listing_id = $request->listing_id;
+            $saved = $flag->save();
+            if ($saved){
+                $admin = User::where('role', UserRole::Admin)->first();
+
+                Notification::add(NotificationType::FlaggedNFT, $user->id, $admin->id, $flag);
+                return response()->json(['status' => true,
+                    'message'=> 'Listing flagged',
+                    'data' => new FlaggedListingResource($flag), 
+                ]);
+            }
+            else{
+                return response()->json(['status' => false,
+                    'message'=> 'Listing not flagged',
+                    'data' => null, 
+                ]);
+            }
+
+            
 
         }
         else{
@@ -223,6 +274,32 @@ class MintListingController extends Controller
         return response()->json(['status' => true,
                     'message'=> 'Listings',
                     'data' => MintListingResource::collection($list), 
+                ]);
+
+    }
+
+
+    function getFlaggedListings(Request $request){
+        $user = Auth::user();
+        if(!$user){
+            return response()->json(['status' => false,
+                    'message'=> 'Unauthorized access',
+                    'data' => null, 
+                ]);
+        }
+        $userid = $user->id;
+        
+        if($request->has('off_set')){
+            $off_set = $request->off_set;
+        }
+        
+        $list = FlaggedListing::skip($off_set)->take(20)->get();
+        
+
+
+        return response()->json(['status' => true,
+                    'message'=> 'Flagged Listings',
+                    'data' => FlaggedListingResource::collection($list), 
                 ]);
 
     }
