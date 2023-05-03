@@ -37,13 +37,13 @@ class ProfileUpdateController extends Controller
     	if($request->has('city')){
     		$profile->city = $request->city;
     	}
-    	if($request->has('stats_cdf_exponential(par1, par2, which)')){
+    	if($request->has('state')){
     		$profile->state = $request->state;
     	}
     	if($request->has('lat')){
     		$profile->lat = $request->lat;
     	}
-    	if($request->has('mb_language()')){
+    	if($request->has('lang')){
     		$profile->lang = $request->lang;
     	}
         if($request->hasFile('profile_image'))
