@@ -281,7 +281,7 @@ class AdminController extends Controller
 
         $user = Auth::user();
         if ($user){
-            $userDeleted = User::where('id', $request->user_id)->update(['account_status' => AccountStatus::StatusDeleted]);
+            $userDeleted = Profile::where('user_id', $request->user_id)->update(['account_status' => AccountStatus::StatusDeleted]);
             if($userDeleted){
                 return response()->json([
                     'status' => true,
@@ -302,7 +302,7 @@ class AdminController extends Controller
             ]);
         }
     }
-    
+
     function disableUser(Request $request){
         $validator = Validator::make($request->all(), [
             'user_id' => 'required',
@@ -318,7 +318,7 @@ class AdminController extends Controller
 
         $user = Auth::user();
         if ($user){
-            $userDeleted = User::where('id', $request->user_id)->update(['account_status' => AccountStatus::StatusDisabled]);
+            $userDeleted = Profile::where('user_id', $request->user_id)->update(['account_status' => AccountStatus::StatusDisabled]);
             if($userDeleted){
                 return response()->json([
                     'status' => true,
