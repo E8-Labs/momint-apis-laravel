@@ -10,5 +10,5 @@ class SorterModel extends Model
     use HasFactory;
     const DescendingAlphabetically = 1;
     const NewAccounts = 2;
-    const MonstMints = 3;
+    const MostMints = 3;
 }

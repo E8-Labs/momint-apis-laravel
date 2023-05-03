@@ -25,7 +25,7 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
-	const Page_Limit = 20;
+    const Page_Limit = 20;
 
     // admin function to load user profiles
     public function getUsers(Request $request){
@@ -42,14 +42,14 @@ class AdminController extends Controller
 
         if($user ){//&& $user->isAdmin()
 
-            // $profiles = Profile::where('user_id', '!=', $user->id)->orderBy('created_at', 'DESC')->skip($off_set)->take($this->Page_Limit)->get();
+            // $profiles = Profile::where('user_id', '!=', $user->id)->where('account_status', AccountStatus::StatusActive)->orderBy('created_at', 'DESC')->skip($off_set)->take($this->Page_Limit)->get();
             if($request->has('search')){
                 // return "Search";
                 $search = $request->search;
                 if($search != ''){
                     $tokens = explode(" ", $search);
                     // return $tokens;
-                    $query = Profile::where('user_id', '!=', $user->id);
+                    $query = Profile::where('user_id', '!=', $user->id)->where('account_status', AccountStatus::StatusActive);
                     
                     $query->where(function($query) use($tokens){
                         foreach($tokens as $tok){
@@ -72,31 +72,11 @@ class AdminController extends Controller
                         }
                     }
                     $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
-                    if($sort === SorterModel::DescendingAlphabetically){
-                        $profiles = $query->orderBy('name', 'ASC')->skip($off_set)->take(AdminController::Page_Limit)->get();
-                    }
-                    else if($sort === SorterModel::NewAccounts){
-                        $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
-                    }
-                    else if($sort === SorterModel::MostMints){
-                        $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
-
-                        $list = ListingItem::select('listing_items.*')
-                            ->selectSub(function ($query) {
-                                $query->selectRaw('COUNT(*)')
-                                    ->from('post_intrations')
-                                    ->whereRaw('post_intrations.post_id = listing_items.id');
-                            }, 'post_interactions_count')
-                            ->orderByDesc('post_interactions_count')
-                            ->get();
-                    }
-                    
-                    
                     
                 }
             }
             else{
-                $query = Profile::where('user_id', '!=', $user->id);
+                $query = Profile::where('user_id', '!=', $user->id)->where('account_status', AccountStatus::StatusActive);
                 if($request->has('location')){
                         $location = $request->location;
                         $tokens = explode(",", $location);
@@ -114,24 +94,25 @@ class AdminController extends Controller
                             $query->where('city', 'LIKE', "%$tok%")->where('state', 'LIKE', "%$tok2%");
                         }
                     }
-                $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
-                    if($sort === SorterModel::DescendingAlphabetically){
-                        $profiles = $query->orderBy('name', 'ASC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+                // $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+                    if($sort == SorterModel::DescendingAlphabetically){
+                        $profiles = $query->orderBy('username', 'ASC')->skip($off_set)->take(AdminController::Page_Limit)->get();
                     }
-                    else if($sort === SorterModel::NewAccounts){
+                    else if($sort == SorterModel::NewAccounts){
                         $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
                     }
-                    else if($sort === SorterModel::MostMints){
+                    else if($sort == SorterModel::MostMints){
                         // $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
 
                         $profiles = Profile::select('profiles.*')
                             ->selectSub(function ($query) {
                                 $query->selectRaw('COUNT(*)')
-                                    ->from('listing_items')
-                                    ->whereRaw('listing_items.user_id = profiles.user_id');
+                                    ->from('mintable_listings')
+                                    ->whereRaw('mintable_listings.user_id = profiles.user_id && profiles.account_status = 2');
                             }, 'listing_count')
                             ->orderByDesc('listing_count')
                             ->skip($off_set)->take(AdminController::Page_Limit)->get();
+                            // return "Here";
                     }
             }
             return response()->json([
@@ -158,10 +139,10 @@ class AdminController extends Controller
         //by default show for one month
         $months = 1;
         if($request->has('months')){
-        	$months = $request->months;
+            $months = $request->months;
         }
         if($months > 12){
-        	$months = 1200;
+            $months = 1200;
         }
         $date = Carbon::now()->subMonths($months);//->subDays(7);//->subYears(5)    
         // if($request->has('off_set')){
@@ -321,6 +302,7 @@ class AdminController extends Controller
             ]);
         }
     }
+    
     function disableUser(Request $request){
         $validator = Validator::make($request->all(), [
             'user_id' => 'required',

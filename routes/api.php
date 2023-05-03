@@ -43,8 +43,8 @@ Route::group([
 	Route::get("me",[UserAuthController::class,'getMyProfile']);
 	Route::get("profile",[UserAuthController::class,'getOtherUserProfile']);
 
-    Route::post("delete_user",[UserAuthController::class,'deleteUser']);
-    Route::post("disable_user",[UserAuthController::class,'disableUser']);
+    Route::post("delete_user",[AdminController::class,'deleteUser']);
+    Route::post("disable_user",[AdminController::class,'disableUser']);
 
     Route::post('update_profile', [ProfileUpdateController::class, 'updateProfile']); // New
 
