@@ -93,7 +93,7 @@ class MintListingController extends Controller
 
             foreach($images as $image){
                 $b64 = $image["base64"];
-                $url = '';//$this->storeBase64Image($b64, Auth::user());
+                $url = $this->storeBase64Image($b64, Auth::user());
 
                 $mintImage = new MintableListingImages;
                 $mintImage->listing_id = $listing->id;
