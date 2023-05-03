@@ -14,6 +14,7 @@ use App\Models\Minting\MintableListing;
 use App\Models\Auth\Profile;
 use App\Models\Auth\UserRole;
 use App\Models\Auth\AccountStatus;
+use App\Models\SorterModel;
 // use App\Models\User\VerificationCode;
 use Illuminate\Support\Facades\Mail;
 
@@ -32,6 +33,11 @@ class AdminController extends Controller
         $off_set = 0;
         if($request->has('off_set')){
             $off_set = $request->off_set;
+        }
+        $sort = SorterModel::DescendingAlphabetically;
+
+        if($request->has('sorter')){
+            $sort = $request->sorter;
         }
 
         if($user ){//&& $user->isAdmin()
@@ -65,8 +71,27 @@ class AdminController extends Controller
                             $query->where('city', 'LIKE', "%$tok%")->orWhere('state', 'LIKE', "%$tok2%");
                         }
                     }
-                    
                     $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+                    if($sort === SorterModel::DescendingAlphabetically){
+                        $profiles = $query->orderBy('name', 'ASC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+                    }
+                    else if($sort === SorterModel::NewAccounts){
+                        $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+                    }
+                    else if($sort === SorterModel::MostMints){
+                        $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+
+                        $list = ListingItem::select('listing_items.*')
+                            ->selectSub(function ($query) {
+                                $query->selectRaw('COUNT(*)')
+                                    ->from('post_intrations')
+                                    ->whereRaw('post_intrations.post_id = listing_items.id');
+                            }, 'post_interactions_count')
+                            ->orderByDesc('post_interactions_count')
+                            ->get();
+                    }
+                    
+                    
                     
                 }
             }
@@ -90,6 +115,24 @@ class AdminController extends Controller
                         }
                     }
                 $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+                    if($sort === SorterModel::DescendingAlphabetically){
+                        $profiles = $query->orderBy('name', 'ASC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+                    }
+                    else if($sort === SorterModel::NewAccounts){
+                        $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+                    }
+                    else if($sort === SorterModel::MostMints){
+                        // $profiles = $query->orderBy('created_at', 'DESC')->skip($off_set)->take(AdminController::Page_Limit)->get();
+
+                        $profiles = Profile::select('profiles.*')
+                            ->selectSub(function ($query) {
+                                $query->selectRaw('COUNT(*)')
+                                    ->from('listing_items')
+                                    ->whereRaw('listing_items.user_id = profiles.user_id');
+                            }, 'listing_count')
+                            ->orderByDesc('listing_count')
+                            ->skip($off_set)->take(AdminController::Page_Limit)->get();
+                    }
             }
             return response()->json([
                 'status' => true,
