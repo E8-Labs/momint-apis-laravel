@@ -42,7 +42,7 @@ class MintListingController extends Controller
             'listing_name' => 'required|string|max:255',
             'listing_description' => 'required',
             'images' => 'required',
-            'tags' => 'required'
+            // 'tags' => 'required'
                 ]);
 
             if($validator->fails()){
@@ -243,6 +243,23 @@ class MintListingController extends Controller
                     'data' => null, 
                 ]);
         }
+    }
+
+    function getPreviouslyUsedTags(Request $request){
+        $user = Auth::user();
+        if(!$user){
+            return response()->json(['status' => false,
+                    'message'=> 'Unauthorized access',
+                    'data' => null, 
+                ]);
+        }
+        $userid = $user->id;
+        $listing_ids = MintableListing::where('user_id', $user->id)->pluck('id')->toArray();
+        $list = MintableListingTags::whereIn('listing_id', $listing_ids)->get();
+        return response()->json(['status' => true,
+                    'message'=> 'Recent Tags',
+                    'data' => $list, 
+                ]);
     }
 
     function getListings(Request $request){

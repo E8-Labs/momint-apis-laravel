@@ -55,6 +55,7 @@ Route::group([
 	Route::post("update_listing",[MintListingController::class,'updateListing']);
 	Route::get("get_listings",[MintListingController::class,'getListings']);
     Route::get("get_flagged_listings",[MintListingController::class,'getFlaggedListings']);
+    Route::get("get_recent_tags",[MintListingController::class,'getPreviouslyUsedTags']);
 
     // Route::post('login', 'Auth\UserAuthController@login');
     Route::post('logout', 'Auth\UserAuthController@logout');
