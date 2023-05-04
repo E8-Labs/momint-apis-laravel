@@ -51,7 +51,7 @@ class NotificationController extends Controller
             return response()->json(
                 [
                     "status"  => true,
-                    "message"      => "Notification Updated " . $count
+                    "message"      => "Notification Updated " . $count,
                     "unread" => $count,
                 ], 200
             );
