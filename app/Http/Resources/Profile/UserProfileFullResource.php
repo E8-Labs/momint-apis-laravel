@@ -43,6 +43,7 @@ class UserProfileFullResource extends JsonResource
              'nationality' => $this->nationality,
              "unread_notifications" => $count,
              "listings_count" => $listings,
+             "updated_at" => $this->updated_at, // can be used to check last online
         ];
     }
 }

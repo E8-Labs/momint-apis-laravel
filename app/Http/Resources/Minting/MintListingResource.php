@@ -39,7 +39,7 @@ class MintListingResource extends JsonResource
             'images' => MintableListingImageResource::collection($images),
             "tags" => $tags,
             'minting_status' => $this->minting_status,
-            "created_at": $this->created_at,
+            "created_at" => $this->created_at,
         ];
     }
 }

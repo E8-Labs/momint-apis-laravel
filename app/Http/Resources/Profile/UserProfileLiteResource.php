@@ -38,6 +38,7 @@ class UserProfileLiteResource extends JsonResource
             "listings_count" => $listings,
 
             "unread_notifications" => $count,
+            "updated_at" => $this->updated_at, // can be used to check last online
             // "unread_messages" => $unread_messages,
 
         ];
