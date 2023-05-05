@@ -24,7 +24,7 @@ class ProfileUpdateController extends Controller
     public function updateProfile(Request $request){
     	$user = Auth::user();
     	$profile = Profile::where('user_id', $user->id)->first();
-
+        $profile->action = "Update";
     	if($request->has('fcm_token')){
     		$profile->fcm_token = $request->fcm_token;
     	}

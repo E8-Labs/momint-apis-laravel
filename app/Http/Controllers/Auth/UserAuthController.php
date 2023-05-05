@@ -105,6 +105,8 @@ class UserAuthController extends Controller
 
         $user = Auth::user();
         $profile = Profile::where('user_id', $user->id)->first();
+        $profile->action = "Update";
+        $profile->save();
         $data = ["profile" => new UserProfileFullResource($profile), "access_token" => $token];
         return response()->json([
                 'status' => true,

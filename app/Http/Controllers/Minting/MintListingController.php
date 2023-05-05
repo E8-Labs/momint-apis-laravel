@@ -52,12 +52,16 @@ class MintListingController extends Controller
                     'validation_errors'=> $validator->errors()]);
             }
             $user = Auth::user();
+
             if(!$user){
             return response()->json(['status' => false,
                     'message'=> 'Unauthorized access',
                     'data' => null, 
                 ]);
             }
+            $profile = Profile::where('user_id', $user->id)->first();
+            $profile->action = "AddListing";
+            $profile->save();
             \Log::info("1");
 
             DB::beginTransaction();
@@ -150,6 +154,9 @@ class MintListingController extends Controller
         }
         $saved = $listing->save();
         if($saved){
+            $profile = Profile::where('user_id', $user->id)->first();
+            $profile->action = "Update";
+            $profile->save();
                 return response()->json(['status' => true,
                     'message'=> 'Listing saved',
                     'data' => new MintListingResource($listing), 
@@ -172,6 +179,9 @@ class MintListingController extends Controller
                     'data' => null, 
                 ]);
         }
+        $profile = Profile::where('user_id', $user->id)->first();
+        $profile->action = "DeleteListing";
+        $profile->save();
         if($request->has('listing_id')){
             $listing = MintableListing::where('id', $request->listing_id)->where('user_id', $user->id)->first();
             if(!$listing){
@@ -253,6 +263,9 @@ class MintListingController extends Controller
                     'data' => null, 
                 ]);
         }
+        $profile = Profile::where('user_id', $user->id)->first();
+        $profile->action = "RecentTags";
+        $profile->save();
         $userid = $user->id;
         $listing_ids = MintableListing::where('user_id', $user->id)->pluck('id')->toArray();
         $list = MintableListingTags::whereIn('listing_id', $listing_ids)->get();
@@ -271,6 +284,9 @@ class MintListingController extends Controller
                 ]);
         }
         $userid = $user->id;
+        $profile = Profile::where('user_id', $user->id)->first();
+        $profile->action = "LoadListings";
+        $profile->save();
         if($request->has('user_id')){
             $userid = $request->user_id;
         }
