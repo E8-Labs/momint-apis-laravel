@@ -303,6 +303,9 @@ class MintListingController extends Controller
 
         if($user->role === UserRole::Admin){
             $list = MintableListing::skip($off_set)->take(20)->get();
+            if($request->has('user_id')){
+                $list = MintableListing::where('user_id', $userid)->skip($off_set)->take(20)->get();
+            }   
         }
 
         
