@@ -34,6 +34,9 @@ class ProfileUpdateController extends Controller
     	if($request->has('name')){
     		$profile->name = $request->name;
     	}
+        if($request->has('bio')){
+            $profile->bio = $request->bio;
+        }
     	if($request->has('username')){
     		$profile->username = $request->username;
     	}

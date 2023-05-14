@@ -30,7 +30,8 @@ class UserProfileLiteResource extends JsonResource
         return [
             "id" => $this->user_id,
             "email" => $user->email,
-            "name" => $this->username,
+            "name" => $this->name,
+            "bio" => $this->bio,
             "username" => $this->username,
             "profile_image" => \Config::get('constants.profile_images').$this->image_url,
              "user_id" => $user->id,

@@ -219,6 +219,8 @@ class UserAuthController extends Controller
 				}
 		
 				$profile->username=$request->username;
+                $profile->name=$request->name;
+                $profile->bio=$request->bio;
 				$profile->user_id = $user->id;
 				$result=$profile->save();
 				if($result)
