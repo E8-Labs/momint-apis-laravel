@@ -174,16 +174,6 @@ class MintListingController extends Controller
                     $ipfs_hash = "";
                 }
                 $mintImage->ipfs_hash = $ipfs_hash;
-                $loc = $image["image_location"];
-                if($loc === NULL){
-                    $loc = "";
-                }
-                $mintImage->image_location = $loc;
-                $mintImage->image_width = $image["image_width"];
-                $mintImage->image_height = $image["image_height"];
-                $mintImage->lat = $image["lat"];
-                $mintImage->lang = $image["lang"];
-                $mintImage->image_count = $image["image_count"];
                 $mintImage->save();
 
             }
