@@ -158,6 +158,39 @@ class MintListingController extends Controller
         if($request->has('minting_status')){
             $listing->minting_status = $request->minting_status;
         }
+
+
+        //set IPFS Hashes if it is a drafted listing
+        $images = $request->images; //array of base64 images alongwith data
+
+            foreach($images as $image){
+                
+                $image_id = $image["image_id"];
+                $mintImage = MintableListingImages::where('id', $image_id)->first();
+                // $mintImage->listing_id = $listing->id;
+                // $mintImage->image_url = $url;
+                $ipfs_hash = $image["ipfs_hash"];
+                if($ipfs_hash == NULL){
+                    $ipfs_hash = "";
+                }
+                $mintImage->ipfs_hash = $ipfs_hash;
+                $loc = $image["image_location"];
+                if($loc === NULL){
+                    $loc = "";
+                }
+                $mintImage->image_location = $loc;
+                $mintImage->image_width = $image["image_width"];
+                $mintImage->image_height = $image["image_height"];
+                $mintImage->lat = $image["lat"];
+                $mintImage->lang = $image["lang"];
+                $mintImage->image_count = $image["image_count"];
+                $mintImage->save();
+
+            }
+
+
+
+
         $saved = $listing->save();
         if($saved){
             $profile = Profile::where('user_id', $user->id)->first();
