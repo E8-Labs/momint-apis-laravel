@@ -11,4 +11,5 @@ class MintableListingStatus extends Model
     const StatusMinted = 1;
     const StatusListed = 2;
     const StatusBoth = 3;
+    const StatusDraft = 4;
 }

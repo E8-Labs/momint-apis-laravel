@@ -69,6 +69,9 @@ class MintListingController extends Controller
             $listing->listing_name = $request->listing_name;
             $listing->is_explicit_content = $request->is_explicit_content;
             $listing->listing_description = $request->listing_description;
+            if($request->has('status')){
+                $listing->minting_status = $request->status;
+            }
             $listing->user_id = Auth::user()->id;
             $saved = $listing->save();
 \Log::info("2");
@@ -102,7 +105,10 @@ class MintListingController extends Controller
                 $mintImage = new MintableListingImages;
                 $mintImage->listing_id = $listing->id;
                 $mintImage->image_url = $url;
-                $mintImage->ipfs_hash = $image["ipfs_hash"];
+                $ipfs_hash = $image["ipfs_hash"];
+                if($ipfs_hash == NULL){
+                    $mintImage->ipfs_hash = "";
+                }
                 $loc = $image["image_location"];
                 if($loc === NULL){
                     $loc = "";
@@ -302,9 +308,9 @@ class MintListingController extends Controller
         }
 
         if($user->role === UserRole::Admin){
-            $list = MintableListing::skip($off_set)->take(20)->get();
+            $list = MintableListing::orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
             if($request->has('user_id')){
-                $list = MintableListing::where('user_id', $userid)->skip($off_set)->take(20)->get();
+                $list = MintableListing::where('user_id', $userid)->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
             }   
         }
 

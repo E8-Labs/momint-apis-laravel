@@ -21,6 +21,7 @@ return new class extends Migration
             ['id'=> MintableListingStatus::StatusMinted, 'name' => 'Minted'],
             ['id'=> MintableListingStatus::StatusListed, 'name' => 'Listed'],
             ['id'=> MintableListingStatus::StatusBoth, 'name' => 'Both'],
+            ['id'=> MintableListingStatus::StatusDraft, 'name' => 'Draft']
             
         ]);
     }
