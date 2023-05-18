@@ -107,8 +107,9 @@ class MintListingController extends Controller
                 $mintImage->image_url = $url;
                 $ipfs_hash = $image["ipfs_hash"];
                 if($ipfs_hash == NULL){
-                    $mintImage->ipfs_hash = "";
+                    $ipfs_hash = "";
                 }
+                $mintImage->ipfs_hash = $ipfs_hash;
                 $loc = $image["image_location"];
                 if($loc === NULL){
                     $loc = "";
@@ -157,11 +158,26 @@ class MintListingController extends Controller
         }
         if($request->has('minting_status')){
             $listing->minting_status = $request->minting_status;
+            // if($request->minting_status == MintableListingStatus::StatusDraft){
+            //     $listing->minting_status = MintableListingStatus::StatusMinted;
+            // }
         }
 
+        if($request->has('listing_name')){
+            $listing->listing_name = $request->listing_name;
+        }
+        if($request->has('is_explicit_content')){
+            $listing->is_explicit_content = $request->is_explicit_content;
+        }
+        if($request->has('listing_description')){
+            $listing->listing_description = $request->listing_description;
+        }
+        
+        
 
         //set IPFS Hashes if it is a drafted listing
-        $images = $request->images; //array of base64 images alongwith data
+        if($request->has("images")){
+            $images = $request->images; //array of base64 images alongwith data
 
             foreach($images as $image){
                 
@@ -177,6 +193,7 @@ class MintListingController extends Controller
                 $mintImage->save();
 
             }
+        }
 
 
 
@@ -212,7 +229,7 @@ class MintListingController extends Controller
         $profile->action = "DeleteListing";
         $profile->save();
         if($request->has('listing_id')){
-            $listing = MintableListing::where('id', $request->listing_id)->where('user_id', $user->id)->first();
+            $listing = MintableListing::where('id', $request->listing_id)->first();
             if(!$listing){
                 return response()->json(['status' => false,
                     'message'=> 'No Such Listing',

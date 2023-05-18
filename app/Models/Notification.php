@@ -129,6 +129,9 @@ $sendToUser = Profile::where('user_id', $notification->to_user)->first();
             case NotificationType::NewEmail:
                     $title = "New Email";
                 break;
+            case NotificationType::AccountDeactivated:
+                    $title = "Account Deactivated";
+                break;
             
         }
 
@@ -166,6 +169,10 @@ $sendToUser = Profile::where('user_id', $notification->to_user)->first();
                 break;
             case NotificationType::NewFeedback:
                 $message = $from->username . " sent a new feedback.";
+                break;
+
+            case NotificationType::AccountDeactivated:
+                $message = "Your account has been deactivated. Contact Admin";
                 break;
             
         }

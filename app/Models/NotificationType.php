@@ -15,7 +15,7 @@ class NotificationType extends Model
 	const FlaggedUser = 5;
 	const FlaggedNFT = 6;
 	const NewFeedback = 7;
-    
+    const AccountDeactivated = 8;
     
     
     

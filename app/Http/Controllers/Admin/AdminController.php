@@ -21,6 +21,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Resources\Profile\UserProfileFullResource;
 use App\Http\Resources\Profile\UserProfileLiteResource;
 
+use App\Models\Notification;
+use App\Models\NotificationType;
+
 use Carbon\Carbon;
 
 class AdminController extends Controller
@@ -320,6 +323,8 @@ class AdminController extends Controller
         if ($user){
             $userDeleted = Profile::where('user_id', $request->user_id)->update(['account_status' => AccountStatus::StatusDisabled]);
             if($userDeleted){
+                $toUser = User::where('id', $request->user_id)->first();
+                Notification::add(NotificationType::AccountDeactivated, $user->id, $toUser->id, $toUser);
                 return response()->json([
                     'status' => true,
                     'message' => 'User Disabled',
