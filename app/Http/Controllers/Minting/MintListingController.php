@@ -314,7 +314,7 @@ class MintListingController extends Controller
         $profile->save();
         $userid = $user->id;
         $listing_ids = MintableListing::where('user_id', $user->id)->pluck('id')->toArray();
-        $list = MintableListingTags::whereIn('listing_id', $listing_ids)->get();
+        $list = MintableListingTags::whereIn('listing_id', $listing_ids)->groupBy('tag')->get();
         return response()->json(['status' => true,
                     'message'=> 'Recent Tags',
                     'data' => $list, 
