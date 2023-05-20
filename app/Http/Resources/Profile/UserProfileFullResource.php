@@ -27,6 +27,11 @@ class UserProfileFullResource extends JsonResource
 
         $count = Notification::where('to_user', $user->id)->where('is_read', 0)->count('id');
         $listings = MintableListing::where('user_id', $user->id)->count('id');
+
+        $username = $this->username;
+        if(strpos($username, "@") === 0){
+            $username = str_replace($username, '', "@") ;
+        }
         return [
             "id" => $this->user_id,
             "email" => $user->email,
