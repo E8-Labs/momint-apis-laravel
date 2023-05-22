@@ -348,7 +348,9 @@ class MintListingController extends Controller
         }
 
         if($user->role === UserRole::Admin){
-            $list = MintableListing::orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
+            $userIds = Profile::where('account_status', AccountStatus::StatusDisabled)
+            ->orWhere('account_status', AccountStatus::StatusDeleted)->pluck('user_id')->toArray();
+            $list = MintableListing::whereNotIn('user_id', $userIds)->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
             if($request->has('user_id')){
                 $list = MintableListing::where('user_id', $userid)->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
             }   

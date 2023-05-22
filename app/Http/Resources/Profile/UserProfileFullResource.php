@@ -30,14 +30,17 @@ class UserProfileFullResource extends JsonResource
 
         $username = $this->username;
         if(strpos($username, "@") === 0){
-            $username = str_replace($username, '', "@") ;
+            
+        }
+        else{
+            $username = "@" . $username; //str_replace($username, '', "@") ;
         }
         return [
             "id" => $this->user_id,
             "email" => $user->email,
             "name" => $this->name,
             "bio" => $this->bio,
-            "username" => $this->username,
+            "username" => $username,
             "profile_image" => \Config::get('constants.profile_images').$this->image_url,
             "authProvider" => $p,
             'city' => $this->city,

@@ -29,7 +29,10 @@ class UserProfileLiteResource extends JsonResource
         $listings = MintableListing::where('user_id', $user->id)->count('id');
         $username = $this->username;
         if(strpos($username, "@") === 0){
-            $username = str_replace($username, '', "@") ;
+            
+        }
+        else{
+            $username = "@" . $username; //str_replace($username, '', "@") ;
         }
 
 
@@ -38,7 +41,7 @@ class UserProfileLiteResource extends JsonResource
             "email" => $user->email,
             "name" => $this->name,
             "bio" => $this->bio,
-            "username" => $this->username,
+            "username" => $username,
             "profile_image" => \Config::get('constants.profile_images').$this->image_url,
              "user_id" => $user->id,
             "role" => $user->role,
