@@ -57,7 +57,7 @@ class AdminController extends Controller
                     $query->where(function($query) use($tokens){
                         foreach($tokens as $tok){
 
-                            $query->where('username', 'LIKE', "%$tok%");
+                            $query->where('username', 'LIKE', "%$tok%")->orWhere('name', 'LIKE', "%$tok%");
                         }
                     });
                     if($request->has('location')){

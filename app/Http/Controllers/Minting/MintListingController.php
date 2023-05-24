@@ -34,6 +34,7 @@ use App\Models\Minting\FlaggedListing;
 
 use App\Models\Notification;
 use App\Models\NotificationType;
+use App\Models\Auth\AccountStatus;
 
 class MintListingController extends Controller
 {
@@ -69,8 +70,8 @@ class MintListingController extends Controller
             $listing->listing_name = $request->listing_name;
             $listing->is_explicit_content = $request->is_explicit_content;
             $listing->listing_description = $request->listing_description;
-            if($request->has('status')){
-                $listing->minting_status = $request->status;
+            if($request->has('minting_status')){
+                $listing->minting_status = $request->minting_status;
             }
             $listing->user_id = Auth::user()->id;
             $saved = $listing->save();
@@ -314,11 +315,27 @@ class MintListingController extends Controller
         $profile->save();
         $userid = $user->id;
         $listing_ids = MintableListing::where('user_id', $user->id)->pluck('id')->toArray();
-        $list = MintableListingTags::whereIn('listing_id', $listing_ids)->groupBy('tag')->get();
+        $list = MintableListingTags::whereIn('listing_id', $listing_ids)->get();
+        $tags = $this->unique_array($list, "tag");
         return response()->json(['status' => true,
                     'message'=> 'Recent Tags',
-                    'data' => $list, 
+                    'data' => $tags, 
                 ]);
+    }
+    
+    function unique_array($array, $key) {
+        $temp_array = array();
+        $i = 0;
+        $key_array = array();
+    
+        foreach($array as $val) {
+            if (!in_array($val[$key], $key_array)) {
+                $key_array[$i] = $val[$key];
+                $temp_array[] = $val;
+            }
+            $i++;
+        }
+        return $temp_array;
     }
 
     function getListings(Request $request){
