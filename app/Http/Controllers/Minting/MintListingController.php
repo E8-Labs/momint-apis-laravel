@@ -368,6 +368,20 @@ class MintListingController extends Controller
             $userIds = Profile::where('account_status', AccountStatus::StatusDisabled)
             ->orWhere('account_status', AccountStatus::StatusDeleted)->pluck('user_id')->toArray();
             $list = MintableListing::whereNotIn('user_id', $userIds)->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
+            $search = $request->search;
+                if($search != ''){
+                    $tokens = explode(" ", $search);
+                    // return $tokens;
+                    $query = MintableListing::whereNotIn('user_id', $userIds)->orderBy("created_at", "DESC");
+                    
+                    $query->where(function($query) use($tokens){
+                        foreach($tokens as $tok){
+
+                            $query->where('listing_name', 'LIKE', "%$tok%")->orWhere('listing_description', 'LIKE', "%$tok%");
+                        }
+                    });
+                    $list = $query->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
+                }
             if($request->has('user_id')){
                 $list = MintableListing::where('user_id', $userid)->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
             }   

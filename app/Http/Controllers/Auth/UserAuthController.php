@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Notification;
 use App\Models\NotificationType;
 
+use App\Models\Auth\AccountStatus;
+
 class UserAuthController extends Controller
 {
 	const RULE_PHONE = 'required|min:10|numeric';
@@ -105,6 +107,18 @@ class UserAuthController extends Controller
 
         $user = Auth::user();
         $profile = Profile::where('user_id', $user->id)->first();
+        if($profile->account_status == AccountStatus::StatusDisabled){
+            return response()->json([
+                'status' => false,
+                'message' => 'Your account is disabled by admin',
+            ], 200);
+        }
+        if($profile->account_status == AccountStatus::StatusDeleted){
+            return response()->json([
+                'status' => false,
+                'message' => 'Your account is deleted by admin',
+            ], 200);
+        }
         $profile->action = "Update";
         $profile->save();
         $data = ["profile" => new UserProfileFullResource($profile), "access_token" => $token];
