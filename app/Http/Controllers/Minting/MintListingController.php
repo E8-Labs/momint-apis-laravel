@@ -126,8 +126,11 @@ class MintListingController extends Controller
             }
 \Log::info("5");
             DB::commit();
-            $admin = User::where('role', UserRole::Admin)->first();
-            Notification::add(NotificationType::NewNFT, $user->id, $admin->id, $listing);
+            if($listing->minting_status != MintableListingStatus::StatusDraft){
+                $admin = User::where('role', UserRole::Admin)->first();
+                Notification::add(NotificationType::NewNFT, $user->id, $admin->id, $listing);
+            }
+            
             return response()->json(['status' => true,
                     'message'=> 'Listing saved',
                     'data' => new MintListingResource($listing), 
@@ -383,7 +386,7 @@ class MintListingController extends Controller
                     $list = $query->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
                 }
             if($request->has('user_id')){
-                $list = MintableListing::where('user_id', $userid)->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
+                $list = MintableListing::where('user_id', $userid)->where('minting_status', '!=', MintableListingStatus::StatusDraft)->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
             }   
         }
 
