@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('is_explicit_content')->default(0);
             $table->string('listing_description')->nullable();
             $table->double("listing_price")->nullable();
+            $table->double("gas_fee")->nullable();
             $table->string('currency')->nullable();
             $table->double('royalty_percentage')->nullable();
             $table->string('nft_id')->nullable();

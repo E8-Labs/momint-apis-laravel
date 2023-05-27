@@ -84,6 +84,18 @@ class MintListingController extends Controller
                 $listing->minting_status = MintableListingStatus::StatusMinted;
 
             }
+            if($request->has('listing_price')){
+                $listing->listing_price = $request->listing_price;
+            }
+            if($request->has('currency')){
+                $listing->currency = $request->currency;
+            }
+            if($request->has('royalty_percentage')){
+                $listing->royalty_percentage = $request->royalty_percentage;
+            }
+            if($request->has('gas_fee')){
+                $listing->gas_fee = $request->gas_fee;
+            }
             $listing->user_id = Auth::user()->id;
             $saved = $listing->save();
 \Log::info("2");
