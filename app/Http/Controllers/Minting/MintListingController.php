@@ -70,8 +70,19 @@ class MintListingController extends Controller
             $listing->listing_name = $request->listing_name;
             $listing->is_explicit_content = $request->is_explicit_content;
             $listing->listing_description = $request->listing_description;
-            if($request->has('minting_status')){
+            $listing->nft_id = $request->nft_id;
+            if($request->has('minting_status')){ // if draft then save it as a draft.
                 $listing->minting_status = $request->minting_status;
+            }
+            if($request->has('listing_id')){
+                // if there is already a listing id then a draft is being minted and saved
+                // delete the already present id 
+                // set the status to Minted instead of draft
+                // Then save the listing brand new
+
+                $del = MintableListing::where('id', $request->listing_id)->delete();
+                $listing->minting_status = MintableListingStatus::StatusMinted;
+
             }
             $listing->user_id = Auth::user()->id;
             $saved = $listing->save();
@@ -370,12 +381,12 @@ class MintListingController extends Controller
         if($user->role === UserRole::Admin){
             $userIds = Profile::where('account_status', AccountStatus::StatusDisabled)
             ->orWhere('account_status', AccountStatus::StatusDeleted)->pluck('user_id')->toArray();
-            $list = MintableListing::whereNotIn('user_id', $userIds)->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
+            $list = MintableListing::whereNotIn('user_id', $userIds)->where('minting_status', '!=', MintableListingStatus::StatusDraft)->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
             $search = $request->search;
                 if($search != ''){
                     $tokens = explode(" ", $search);
                     // return $tokens;
-                    $query = MintableListing::whereNotIn('user_id', $userIds)->orderBy("created_at", "DESC");
+                    $query = MintableListing::whereNotIn('user_id', $userIds)->where('minting_status', '!=', MintableListingStatus::StatusDraft)->orderBy("created_at", "DESC");
                     
                     $query->where(function($query) use($tokens){
                         foreach($tokens as $tok){

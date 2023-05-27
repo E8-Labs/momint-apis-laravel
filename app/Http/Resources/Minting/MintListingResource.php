@@ -38,6 +38,7 @@ class MintListingResource extends JsonResource
             "user" => new UserProfileLiteResource($profile),
             'images' => MintableListingImageResource::collection($images),
             "tags" => $tags,
+            "nft_id" => $this->nft_id,
             'minting_status' => $this->minting_status,
             "created_at" => $this->created_at,
         ];
