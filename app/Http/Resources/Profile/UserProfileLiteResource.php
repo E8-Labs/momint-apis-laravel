@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Notification;
 use App\Models\NotificationType;
 use App\Models\Minting\MintableListing;
+use App\Models\Minting\MintableListingStatus;
 
 class UserProfileLiteResource extends JsonResource
 {
@@ -26,7 +27,7 @@ class UserProfileLiteResource extends JsonResource
         }
         $count = Notification::where('to_user', $user->id)->where('is_read', 0)->count('id');
 
-        $listings = MintableListing::where('user_id', $user->id)->count('id');
+        $listings = MintableListing::where('user_id', $user->id)->where('minting_status', '!=', MintableListingStatus::StatusDraft)->count('id');
         $username = $this->username;
         if(strpos($username, "@") === 0){
             

@@ -402,8 +402,8 @@ class MintListingController extends Controller
                     
                     $query->where(function($query) use($tokens){
                         foreach($tokens as $tok){
-
-                            $query->where('listing_name', 'LIKE', "%$tok%")->orWhere('listing_description', 'LIKE', "%$tok%");
+                            $ids = MintableListingTags::where('tag', 'LIKE', "%$tok%")->pluck('listing_id')->toArray();
+                            $query->where('listing_name', 'LIKE', "%$tok%")->orWhere('listing_description', 'LIKE', "%$tok%")->orWhereIn('id', $ids);
                         }
                     });
                     $list = $query->orderBy("created_at", "DESC")->skip($off_set)->take(20)->get();
