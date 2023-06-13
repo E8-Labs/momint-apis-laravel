@@ -7,6 +7,7 @@ use App\Http\Controllers\Minting\MintListingController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\ProfileUpdateController;
+use App\Http\Controllers\ForgotPasswordController;
 
 /*
 |--------------------------------------------------------------------------
