@@ -34,6 +34,12 @@ Route::post('send_test_email', [UserAuthController::class, 'sendTestEmail']);
 Route::post('send_code', [UserAuthController::class, 'sendVerificationMail']);
 Route::post('verify_email', [UserAuthController::class, 'confirmVerificationCode']);
 
+
+Route::post('forgot_password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('reset.password.post');
+Route::get('reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
+Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
+
+
 Route::group([
 
     'middleware' => 'api',

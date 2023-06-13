@@ -22,6 +22,8 @@
 <br/>
 <br/>
 
+<p style="padding-left: 23px; font-family: 'Lato', sans-serif; font-size:15px">  <strong>Feedback For</strong> : {{$feedback_type}} </p>
+
 <p style="padding-left: 23px; font-family: 'Lato', sans-serif; font-size:15px">  <strong>Message</strong> : {{$user_message}} </p>
         
 		

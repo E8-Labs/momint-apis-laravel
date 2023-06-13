@@ -104,7 +104,7 @@ class UserAuthController extends Controller
                 }
                 $user = Auth::user();
                 $profile = Profile::where('user_id', $user->id)->first();
-                $data = array('user_name'=> $profile->name, "user_email" => $user->email, "user_message" => $req->message);
+                $data = array('user_name'=> $profile->name, "user_email" => $user->email, "user_message" => $req->message, "feedback_type" => $req->feedback_type);
                 Mail::send('Mail/ContactUs', $data, function ($message) use ($data) {
                         $message->to("salmanmajid14@gmail.com",'Contact Us')->subject('User Contact');
                         $message->from($data['user_email']);
