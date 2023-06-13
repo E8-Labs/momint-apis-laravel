@@ -66,7 +66,27 @@ class MintListingController extends Controller
             \Log::info("1");
 
             DB::beginTransaction();
-            $listing = new MintableListing;
+            
+            if($request->has('listing_id')){
+                // if there is already a listing id then a draft is being minted and saved
+                // delete the already present id 
+                // set the status to Minted instead of draft
+                // Then save the listing brand new
+
+                // $del = MintableListing::where('id', $request->listing_id)->delete();
+                //New logic: Instead of deleting, just get that listing and change the details
+                $listing = MintableListing::where('id', $request->listing_id)->first();
+                if($listing->minting_status === MintableListingStatus::StatusDraft){
+                    $listing->minting_status = MintableListingStatus::StatusMinted;
+                }
+                else{
+                    $listing->minting_status = MintableListingStatus::StatusListed;
+                }
+
+            }
+            else{
+                $listing = new MintableListing;
+            }
             $listing->listing_name = $request->listing_name;
             $listing->is_explicit_content = $request->is_explicit_content;
             $listing->listing_description = $request->listing_description;
@@ -74,26 +94,28 @@ class MintListingController extends Controller
             if($request->has('minting_status')){ // if draft then save it as a draft.
                 $listing->minting_status = $request->minting_status;
             }
-            if($request->has('listing_id')){
-                // if there is already a listing id then a draft is being minted and saved
-                // delete the already present id 
-                // set the status to Minted instead of draft
-                // Then save the listing brand new
-
-                $del = MintableListing::where('id', $request->listing_id)->delete();
-                $listing->minting_status = MintableListingStatus::StatusMinted;
-
-            }
+            
             if($request->has('listing_price')){
+                $listing->minting_status = MintableListingStatus::StatusListed;
                 $listing->listing_price = $request->listing_price;
             }
             if($request->has('currency')){
+                $listing->minting_status = MintableListingStatus::StatusListed;
                 $listing->currency = $request->currency;
             }
             if($request->has('royalty_percentage')){
+                $listing->minting_status = MintableListingStatus::StatusListed;
                 $listing->royalty_percentage = $request->royalty_percentage;
             }
             if($request->has('gas_fee')){
+                $listing->minting_status = MintableListingStatus::StatusListed;
+                $listing->gas_fee = $request->gas_fee;
+            }
+            if($request->has('transaction_detail')){
+                $tr = $request->transaction_detail;
+                $hash = $tr["blockHash"];
+                $listing->transaction_hash = $hash;
+                $listing->minting_status = MintableListingStatus::StatusListed;
                 $listing->gas_fee = $request->gas_fee;
             }
             $listing->user_id = Auth::user()->id;
@@ -109,6 +131,9 @@ class MintListingController extends Controller
             //save tags 
             $tags = $request->tags;
 \Log::info("3");
+            if($request->has('listing_id')){
+                MintableListingTags::where('listing_id', $request->listing_id)->delete();
+            }
             foreach($tags as $tag){
                 \Log::info("Saving ". $tag);
                 $mintTag = new MintableListingTags;
@@ -120,36 +145,42 @@ class MintListingController extends Controller
 
 \Log::info("4");
             //save images
-            $images = $request->images; //array of base64 images alongwith data
-
-            foreach($images as $image){
-                $b64 = $image["base64"];
-                $url = $this->storeBase64Image($b64, Auth::user());
-
-                $mintImage = new MintableListingImages;
-                $mintImage->listing_id = $listing->id;
-                $mintImage->image_url = $url;
-                $ipfs_hash = $image["ipfs_hash"];
-                if($ipfs_hash == NULL){
-                    $ipfs_hash = "";
-                }
-                $mintImage->ipfs_hash = $ipfs_hash;
-                $loc = $image["image_location"];
-                if($loc === NULL){
-                    $loc = "";
-                }
-                $mintImage->image_location = $loc;
-                $mintImage->image_width = $image["image_width"];
-                $mintImage->image_height = $image["image_height"];
-                $mintImage->lat = $image["lat"];
-                $mintImage->lang = $image["lang"];
-                $mintImage->image_count = $image["image_count"];
-                $mintImage->save();
-
+            if($request->has('listing_id')){ // no need to add the images again
+                
             }
+            else{
+                $images = $request->images; //array of base64 images alongwith data
+    
+                foreach($images as $image){
+                    $b64 = $image["base64"];
+                    $url = "";//$this->storeBase64Image($b64, Auth::user());
+    
+                    $mintImage = new MintableListingImages;
+                    $mintImage->listing_id = $listing->id;
+                    $mintImage->image_url = $url;
+                    $ipfs_hash = $image["ipfs_hash"];
+                    if($ipfs_hash == NULL){
+                        $ipfs_hash = "";
+                    }
+                    $mintImage->ipfs_hash = $ipfs_hash;
+                    $loc = $image["image_location"];
+                    if($loc === NULL){
+                        $loc = "";
+                    }
+                    $mintImage->image_location = $loc;
+                    $mintImage->image_width = $image["image_width"];
+                    $mintImage->image_height = $image["image_height"];
+                    $mintImage->lat = $image["lat"];
+                    $mintImage->lang = $image["lang"];
+                    $mintImage->image_count = $image["image_count"];
+                    $mintImage->save();
+
+                }
+            }
+            
 \Log::info("5");
             DB::commit();
-            if($listing->minting_status != MintableListingStatus::StatusDraft){
+            if($listing->minting_status != MintableListingStatus::StatusDraft && $listing->minting_status != MintableListingStatus::StatusListed){
                 $admin = User::where('role', UserRole::Admin)->first();
                 Notification::add(NotificationType::NewNFT, $user->id, $admin->id, $listing);
             }

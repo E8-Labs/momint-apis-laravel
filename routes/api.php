@@ -69,4 +69,7 @@ Route::group([
     Route::get('notifications', [NotificationController::class, 'getNotifications']);//New
     Route::get('seen_notification', [NotificationController::class, 'notificationSeen']);//New
 
+
+    Route::post("contact_us",[UserAuthController::class,'contactUs']);
+
 });

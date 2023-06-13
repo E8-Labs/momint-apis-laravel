@@ -92,6 +92,29 @@ class UserAuthController extends Controller
     	}
     }
 
+    function contactUs(Request $req){
+        $validator = Validator::make($req->all(), [
+                'message' => 'required',
+                    ]);
+            if($validator->fails()){
+                    return response()->json(['status' => false,
+                    'message'=> 'validation error',
+                    'data' => null,
+                    'validation_errors'=> $validator->errors()]);
+                }
+                $user = Auth::user();
+                $profile = Profile::where('user_id', $user->id)->first();
+                $data = array('user_name'=> $profile->name, "user_email" => $user->email, "user_message" => $req->message);
+                Mail::send('Mail/ContactUs', $data, function ($message) use ($data) {
+                        $message->to("salmanmajid14@gmail.com",'Contact Us')->subject('User Contact');
+                        $message->from($data['user_email']);
+                    });
+
+                return response()->json(['status' => true, 
+                    'message'=> 'Feedback sent', 
+                    'data' => null]);
+    }
+
     public function login(Request $request)
     {
         

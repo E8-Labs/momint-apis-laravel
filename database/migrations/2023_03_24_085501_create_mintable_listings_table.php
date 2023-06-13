@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('currency')->nullable();
             $table->double('royalty_percentage')->nullable();
             $table->string('nft_id')->nullable();
+            $table->string('transaction_hash')->nullable();
             $table->unsignedBigInteger('minting_status')->default(MintableListingStatus::StatusMinted);
             $table->foreign('minting_status')->references('id')->on('mintable_listing_statuses')->onDelete('cascade');
             $table->timestamps();
