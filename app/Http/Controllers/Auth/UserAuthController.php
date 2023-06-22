@@ -25,26 +25,26 @@ use App\Models\Auth\AccountStatus;
 
 class UserAuthController extends Controller
 {
-	const RULE_PHONE = 'required|min:10|numeric';
-	const RULE_EMAIL = 'required|email';
-	const RULE_NAME = 'required|min:3';
+    const RULE_PHONE = 'required|min:10|numeric';
+    const RULE_EMAIL = 'required|email';
+    const RULE_NAME = 'required|min:3';
 
-	public function getMyProfile(Request $request){
-    	$user = Auth::user();
-    	if($user){
-    		$profile = Profile::where('user_id', $user->id)->first();
-    		return response()->json([
+    public function getMyProfile(Request $request){
+        $user = Auth::user();
+        if($user){
+            $profile = Profile::where('user_id', $user->id)->first();
+            return response()->json([
                 'status' => true,
                 'message' => 'User found',
                 'data' => new UserProfileFullResource($profile),
             ], 200);
-    	}
-    	else{
-    		return response()->json([
+        }
+        else{
+            return response()->json([
                 'status' => false,
                 'message' => 'User not found',
             ], 404);
-    	}
+        }
     }
 
     function deleteUser(Request $request){
@@ -73,23 +73,23 @@ class UserAuthController extends Controller
     }
 
     public function getOtherUserProfile(Request $request){
-    	$user = Auth::user();
-    	if($user){
-    		$userid = $request->user_id;
-    		// return $userid;
-    		$profile = Profile::where('user_id', $userid)->first();
-    		return response()->json([
+        $user = Auth::user();
+        if($user){
+            $userid = $request->user_id;
+            // return $userid;
+            $profile = Profile::where('user_id', $userid)->first();
+            return response()->json([
                 'status' => true,
                 'message' => 'User found',
                 'data' => new UserProfileFullResource($profile),
             ], 200);
-    	}
-    	else{
-    		return response()->json([
+        }
+        else{
+            return response()->json([
                 'status' => false,
                 'message' => 'Unauthenticated access',
             ], 401);
-    	}
+        }
     }
 
     function contactUs(Request $req){
@@ -106,10 +106,11 @@ class UserAuthController extends Controller
                 $profile = Profile::where('user_id', $user->id)->first();
                 $data = array('user_name'=> $profile->name, "user_email" => $user->email, "user_message" => $req->message, "feedback_type" => $req->feedback_type);
                 Mail::send('Mail/ContactUs', $data, function ($message) use ($data) {
-                        $message->to("salmanmajid14@gmail.com",'Contact Us')->subject('User Contact');
+                        $message->to("appmomint@gmail.com",'Contact Us')->subject('User Contact');
                         $message->from($data['user_email']);
                     });
-
+                    $admin = User::where('role', UserRole::Admin)->first();
+                Notification::add(NotificationType::NewFeedback, $user->id, $admin->id, null);
                 return response()->json(['status' => true, 
                     'message'=> 'Feedback sent', 
                     'data' => null]);
@@ -157,81 +158,81 @@ class UserAuthController extends Controller
 
     public function register(Request $request){
         
-    	$header = $request->header('isEmailAvailable');
-    	$headerUsername = $request->header('isUsernameAvailable');
-    	$headerSendCode = $request->header('sendCode');
-    	$headerVerifyCode = $request->header('verifyCode');
-    	if($header == 'true'){
-    		if( $this->isEmailAvailable($request['email']) ){
+        $header = $request->header('isEmailAvailable');
+        $headerUsername = $request->header('isUsernameAvailable');
+        $headerSendCode = $request->header('sendCode');
+        $headerVerifyCode = $request->header('verifyCode');
+        if($header == 'true'){
+            if( $this->isEmailAvailable($request['email']) ){
               return response()->json(['data' => null, 'status' => true, 'message' => "Email available" ], 200);
             }else{
               return response()->json(['data' => null, 'status' => false, 'message' => "Email already taken" ], 200);
             }
-    	}
-    	else if($headerUsername == 'true'){
-    		if( $this->isUsernameAvailable($request['username']) ){
+        }
+        else if($headerUsername == 'true'){
+            if( $this->isUsernameAvailable($request['username']) ){
               return response()->json(['data' => null, 'status' => true, 'message' => "Username available" ], 200);
             }else{
               return response()->json(['data' => null, 'status' => false, 'message' => "Username already taken" ], 200);
             }
-    	}
-    	else if($headerSendCode == 'true'){
-    		if( $this->isEmailAvailable($request['email']) ){
-              	$sent = $this->sendVerificationMail($request);
-              	if($sent){
-              		return response()->json(['status' => true,
-						'message'=> 'Code sent',
-						'data' => null,
-					]);
-              	}
-              	else{
-              		return response()->json(['status' => false,
-						'message'=> 'Error sending code',
-						'data' => null,
-					]);
-              	}
+        }
+        else if($headerSendCode == 'true'){
+            if( $this->isEmailAvailable($request['email']) ){
+                $sent = $this->sendVerificationMail($request);
+                if($sent){
+                    return response()->json(['status' => true,
+                        'message'=> 'Code sent',
+                        'data' => null,
+                    ]);
+                }
+                else{
+                    return response()->json(['status' => false,
+                        'message'=> 'Error sending code',
+                        'data' => null,
+                    ]);
+                }
             }else{
               return response()->json(['data' => null, 'status' => false, 'message' => "Email already taken" ], 200);
             }
-    	}
-    	else if($headerVerifyCode == 'true'){
-    		$confirmed = $this->confirmVerificationCode($request);
-    		if($confirmed){
-    			return response()->json(['status' => true,
-						'message'=> 'Email verified',
-						'data' => null,
-					]);
-    		}
-    		else{
-    			return response()->json(['status' => false,
-						'message'=> 'Error verifying',
-						'data' => null,
-					]);
-    		}
-    	}
-    	else{
-    		$validator = Validator::make($request->all(), [
-			'username' => 'required|string|max:255',
+        }
+        else if($headerVerifyCode == 'true'){
+            $confirmed = $this->confirmVerificationCode($request);
+            if($confirmed){
+                return response()->json(['status' => true,
+                        'message'=> 'Email verified',
+                        'data' => null,
+                    ]);
+            }
+            else{
+                return response()->json(['status' => false,
+                        'message'=> 'Error verifying',
+                        'data' => null,
+                    ]);
+            }
+        }
+        else{
+            $validator = Validator::make($request->all(), [
+            'username' => 'required|string|max:255',
             // 'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
             // 'profile_image' => 'required'
-				]);
+                ]);
 
-			if($validator->fails()){
-				return response()->json(['status' => false,
-					'message'=> 'validation error',
-					'data' => null, 
-					'validation_errors'=> $validator->errors()]);
-			}
-			$exists = User::where('email', $request->email)->first();
-			if($exists){
-				return response()->json(['status' => false,
-					'message'=> 'Email already exists',
-					'data' => null, 
-				]);
-			}
+            if($validator->fails()){
+                return response()->json(['status' => false,
+                    'message'=> 'validation error',
+                    'data' => null, 
+                    'validation_errors'=> $validator->errors()]);
+            }
+            $exists = User::where('email', $request->email)->first();
+            if($exists){
+                return response()->json(['status' => false,
+                    'message'=> 'Email already exists',
+                    'data' => null, 
+                ]);
+            }
 
-			DB::beginTransaction();
+            DB::beginTransaction();
         $user = User::create([
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -242,65 +243,65 @@ class UserAuthController extends Controller
 
 
         if($user){
-        	$profile=new Profile;
-    	// return "Creating user";
-				if($request->hasFile('profile_image'))
-				{
-					$data=$request->file('profile_image')->store('Images/');
-					$profile->image_url = $data;
-					
-				}
-				else
-				{
-					$profile->image_url = "";
-				}
-		
-				$profile->username=$request->username;
+            $profile=new Profile;
+        // return "Creating user";
+                if($request->hasFile('profile_image'))
+                {
+                    $data=$request->file('profile_image')->store('Images/');
+                    $profile->image_url = $data;
+                    
+                }
+                else
+                {
+                    $profile->image_url = "";
+                }
+        
+                $profile->username=$request->username;
                 $profile->name=$request->name;
                 $profile->bio=$request->bio;
-				$profile->user_id = $user->id;
-				$result=$profile->save();
-				if($result)
-				{
-					DB::commit();
-        			$token = Auth::login($user);
+                $profile->user_id = $user->id;
+                $result=$profile->save();
+                if($result)
+                {
+                    DB::commit();
+                    $token = Auth::login($user);
                     $admin = User::where('role', UserRole::Admin)->first();
                     Notification::add(NotificationType::NewUser, $user->id, $admin->id, $user);
-        			return response()->json([
-        			    'status' => true,
-        			    'message' => 'User created successfully',
-        			    'data' => [
-        			    	'profile' => new UserProfileFullResource($profile),
-        			        'access_token' => $token,
-        			        'type' => 'bearer',
-        			    	
-        				]
-        			]);
-					
-					
-				}
-				else
-				{
-					DB::rollBack();
-        			return response()->json([
-            			'status' => false,
-            			'message' => "Error saving profile",
-            			'data' => NULL,
-            	
-        			]);
-				}
-        	
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'User created successfully',
+                        'data' => [
+                            'profile' => new UserProfileFullResource($profile),
+                            'access_token' => $token,
+                            'type' => 'bearer',
+                            
+                        ]
+                    ]);
+                    
+                    
+                }
+                else
+                {
+                    DB::rollBack();
+                    return response()->json([
+                        'status' => false,
+                        'message' => "Error saving profile",
+                        'data' => NULL,
+                
+                    ]);
+                }
+            
         }
         else{
-        	DB::rollBack();
-        	return response()->json([
-            		'status' => false,
-            		'message' => "User didn't save",
-            		'data' => NULL,
+            DB::rollBack();
+            return response()->json([
+                    'status' => false,
+                    'message' => "User didn't save",
+                    'data' => NULL,
             
-        		]);
+                ]);
         }
-    	}
+        }
 
         
 
@@ -311,7 +312,7 @@ class UserAuthController extends Controller
 
     public function checkEmailAvailablity(Request $request)
     {
-    	$validator = Validator::make($request->all(), ['email'=> self::RULE_EMAIL]);
+        $validator = Validator::make($request->all(), ['email'=> self::RULE_EMAIL]);
         if ($validator->fails()) {
             return $this->getErrorResponse($validator);
         }else{
@@ -325,7 +326,7 @@ class UserAuthController extends Controller
 
     public function checkPhoneAvailablity(Request $request)
     {
-    	$validator = Validator::make($request->all(), ['phone'=> self::RULE_PHONE]);// 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10'
+        $validator = Validator::make($request->all(), ['phone'=> self::RULE_PHONE]);// 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10'
         if ($validator->fails()) {
             return $this->getErrorResponse($validator);
         }else{
@@ -339,7 +340,7 @@ class UserAuthController extends Controller
 
     public function checkUsernameAvailablity(Request $request)
     {
-    	$validator = Validator::make($request->all(), ['username'=> self::RULE_NAME]);// 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10'
+        $validator = Validator::make($request->all(), ['username'=> self::RULE_NAME]);// 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10'
         if ($validator->fails()) {
             return $this->getErrorResponse($validator);
         }else{
@@ -352,82 +353,82 @@ class UserAuthController extends Controller
     }
 
     function sendVerificationMail(Request $request){
-		$validator = Validator::make($request->all(), [
-			'email' => 'required|string|email',
-				]);
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+                ]);
 
-			if($validator->fails()){
-				return response()->json(['status' => false,
-					'message'=> 'validation error',
-					'data' => null, 
-					'email' => $request->email,
-					'validation_errors'=> $validator->errors()]);
-			}
+            if($validator->fails()){
+                return response()->json(['status' => false,
+                    'message'=> 'validation error',
+                    'data' => null, 
+                    'email' => $request->email,
+                    'validation_errors'=> $validator->errors()]);
+            }
 
-			// set code to codes table
+            // set code to codes table
 
-			$user = User::where('email', $request->email)->first();
-			if($user){
-				return response()->json(['status' => false,
-					'message'=> 'Email is taken',
-					'data' => null
-				]);
-			}
+            $user = User::where('email', $request->email)->first();
+            if($user){
+                return response()->json(['status' => false,
+                    'message'=> 'Email is taken',
+                    'data' => null
+                ]);
+            }
                 
 
-			VerificationCode::where('email', $request->email)->delete();
-			$FourDigitRandomNumber = rand(1111,9999);
-			$code = new VerificationCode;
-			$code->code = $FourDigitRandomNumber;
-			$code->email = $request->email;
-			$res = $code->save();
-			
+            VerificationCode::where('email', $request->email)->delete();
+            $FourDigitRandomNumber = rand(1111,9999);
+            $code = new VerificationCode;
+            $code->code = $FourDigitRandomNumber;
+            $code->email = $request->email;
+            $res = $code->save();
+            
 
-			if($res){
-				$data = array('code'=> $FourDigitRandomNumber, "email" => "the.prevue.app@gmail.com");
-				Mail::send('Mail/verificationmail', $data, function ($message) use ($data, $request) {
+            if($res){
+                $data = array('code'=> $FourDigitRandomNumber, "email" => "appmomint@gmail.com");
+                Mail::send('Mail/verificationmail', $data, function ($message) use ($data, $request) {
                         $message->to($request->email,'Code')->subject('Verification Code');
                         $message->from($data['email']);
                     });
                     
 
-				return true;
-			}
-			else{
-				return false;
-				return response()->json(['status' => false,
-					'message'=> 'Some error occurred',
-					'data' => null]);
-			}
-			
-	}
+                return true;
+            }
+            else{
+                return false;
+                return response()->json(['status' => false,
+                    'message'=> 'Some error occurred',
+                    'data' => null]);
+            }
+            
+    }
 
 
-	function confirmVerificationCode(Request $request){
-		$validator = Validator::make($request->all(), [
-			'email' => 'required|string|email',
-			'code' => 'required'
-				]);
+    function confirmVerificationCode(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'code' => 'required'
+                ]);
 
-			if($validator->fails()){
-				return response()->json(['status' => false,
-					'message'=> 'validation error',
-					'data' => null, 
-					'validation_errors'=> $validator->errors()]);
-			}
+            if($validator->fails()){
+                return response()->json(['status' => false,
+                    'message'=> 'validation error',
+                    'data' => null, 
+                    'validation_errors'=> $validator->errors()]);
+            }
 
-			$digitcode = $request->code;
-			$email = $request->email;
+            $digitcode = $request->code;
+            $email = $request->email;
 
-			$codeDB = VerificationCode::where('email', $email)->where('code', $digitcode)->first();
-			if($codeDB || $request->code == "1234"){
-				VerificationCode::where('email', $request->email)->delete();
-				return true;
-			}
-			else{
-				return false;
-			}
-	}
+            $codeDB = VerificationCode::where('email', $email)->where('code', $digitcode)->first();
+            if($codeDB || $request->code == "1234"){
+                VerificationCode::where('email', $request->email)->delete();
+                return true;
+            }
+            else{
+                return false;
+            }
+    }
 
     private function isEmailAvailable($email)
     {
@@ -466,13 +467,13 @@ class UserAuthController extends Controller
     {
         $tokenRequest = $request->create('/oauth/token', 'POST', $request->all());
         $response = Http::asForm()->post('/oauth/token', [
-		    'grant_type' => 'password',
-		    'client_id' => env('OAUTH_CLIENT_ID'),
-		    'client_secret' => env('OAUTH_CLIENT_SECRET'),
-		    'username' => $email,
-		    'password' => $password,
-		    'scope' => '',
-		]);
+            'grant_type' => 'password',
+            'client_id' => env('OAUTH_CLIENT_ID'),
+            'client_secret' => env('OAUTH_CLIENT_SECRET'),
+            'username' => $email,
+            'password' => $password,
+            'scope' => '',
+        ]);
         $token = (array)json_decode($response->getContent());
 
         echo json_encode(['token' => $token]);
